@@ -3,11 +3,10 @@
      <b-container fluid class="bv-example-row">
        <b-row>
          <b-col>
-            <label for="games">Select Category</label>
-                        <b-form-select id="games" v-model="categorySelected" 
+            <label for="products">Select Category</label>
+                        <b-form-select id="products" v-model="categorySelected" 
                             :options="categories"
                         >
-                        <span>{{categorySelected}}</span>
             </b-form-select>
          </b-col>
        </b-row>
@@ -15,12 +14,12 @@
         <b-row :cols="cols[0]" :cols-sm="cols[1]" :cols-md="cols[2]" 
                :cols-lg="cols[3]" :cols-xl="cols[4]" >
               <b-col  	 
-                v-for="product in products" :key="product.id"	           
+                v-for="product in filterListProducts" :key="product.id"	           
                 col	           
                 no-gutters	           
                 class="mb-2 mt-4"
                >
-                <Product :product="product"/>  
+                <Product :product="product" @update="onDelete"/>  
                       
         </b-col>               
           
@@ -45,6 +44,12 @@ export default {
         }
     },
     methods:{
+        onDelete(item){
+            
+            this.products.slice(item,1)
+            console.log(this.products)
+           
+        },
         getListProducts(){
 
             axios.get('https://front-end-test-app.s3.amazonaws.com/menu.json')
@@ -52,10 +57,8 @@ export default {
                 this.categories = res.data.map(c =>{
                     return {value:c.category_title, text:c.category_title }
                 })
-
-                res.data.map(item=>{
-                    this.products.push(...item.products)
-                })
+                
+                this.listProducts = res.data
 
             })
             .catch(err => {
@@ -93,10 +96,37 @@ export default {
             }
         }
     },
+    computed:{
+        filterListProducts(){
+            if(this.categorySelected != null){
+
+                let products = []
+
+                let categoryProducts = this.listProducts.filter((item) => {
+                    return item.category_title === this.categorySelected;
+                });
+
+                categoryProducts.map(item=>{
+                    products.push(...item.products)
+                })
+                
+                return products
+            
+            } else{
+                
+                this.listProducts.map(item=>{
+                    this.products.push(...item.products)
+                })
+
+                return this.products
+            }
+        }
+    },
     mounted(){
         this.getListProducts()
         this.setSize()
     }
+    
 }
 </script>
 
