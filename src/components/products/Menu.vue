@@ -72,7 +72,7 @@ export default {
         },
         getListProducts(){
 
-                axios.get('https://front-end-test-app.s3.amazonaws.com/menu.json')
+            axios.get('https://front-end-test-app.s3.amazonaws.com/menu.json')
             .then(res =>{
                 this.categories = res.data.map(c =>{
                     return {value:c.category_title, text:c.category_title }
@@ -85,6 +85,7 @@ export default {
                     })
                 })
 
+                this.listProducts = res.data
                         
                 this.listProducts.map(item=>{
                     this.products.push(...item.products)
@@ -138,6 +139,8 @@ export default {
                 let categoryProducts = this.listProducts.filter((item) => {
                     return item.category_title === this.categorySelected;
                 });
+
+                console.log(categoryProducts)
 
                 categoryProducts.map(item=>{
                     products.push(...item.products)
